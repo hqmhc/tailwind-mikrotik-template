@@ -11,6 +11,7 @@
 		$(if refresh-timeout)
 			<meta http-equiv="refresh" content="$(refresh-timeout-secs)">
 		$(endif)
+		<script type="text/javascript" src="js/jquery.min.js"></script>
 		<script language="JavaScript">
 			<!--
 			$(if advert-pending == 'yes')
@@ -23,12 +24,29 @@
 				setTimeout("focusAdvert()", 1000);
 				}
 			$(endif)
-				function openLogout() {
+			function openLogout() {
 				if (window.name != 'hotspot_status') return true;
 					open('$(link-logout)', 'hotspot_logout', 'toolbar=0,location=0,directories=0,status=0,menubars=0,resizable=1,width=280,height=250');
 				window.close();
 				return false;
-				}
+			}
+			function formatBytes(bytes, decimals = 2) {
+				if (!+bytes) return '0 Bytes'
+
+				const k = 1000
+				const dm = decimals < 0 ? 0 : decimals
+				const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
+
+				const i = Math.floor(Math.log(bytes) / Math.log(k))
+
+				return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`
+			}
+			$(if limit-bytes-in)
+				$(function() {
+					// use readable value for data limit
+					$('#data-limit').text(formatBytes('$(remain-bytes-in)'));
+				});
+			$(endif)
 			//-->
 		</script>
 	</head>
@@ -91,6 +109,12 @@
 								<td class="py-2 text-gray-800">$(refresh-timeout)</td>
 							</tr>
 							$(endif)
+							$(if limit-bytes-in)
+							<tr class="border-b border-gray-200 tracking-wide text-sm">
+								<td class="py-2 text-gray-400 uppercase font-semibold">remaining:</td>
+								<td class="py-2 text-gray-800" id="data-limit">$(remain-bytes-in) / $(limit-bytes-in)</td>
+							</tr>
+							$(endif)
 						</tbody>
 					</table>
 					$(if login-by-mac != 'yes')
@@ -102,5 +126,4 @@
 			</div>
 		</div>
 	</body>
-	<script type="text/javascript" src="js/jquery.min.js"></script>
 </html>
